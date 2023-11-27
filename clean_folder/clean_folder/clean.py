@@ -4,9 +4,6 @@ from pathlib import Path
 import os
 import shutil
 
-path = sys.argv[1]
-
-
 images = []
 videos = []
 documents = []
@@ -15,21 +12,22 @@ archives = []
 known_extensions = set()
 unknown_extensions = set()
 
-images_dir = os.path.join(path, 'images')
-videos_dir = os.path.join(path, 'video')
-docs_dir = os.path.join(path, 'documents')
-music_dir = os.path.join(path, 'audio')
-archives_dir = os.path.join(path, 'archives')
-unknown_files_dir = os.path.join(path, 'unknown_files')
-
-
 def sort(path):
+    
+    images_dir = os.path.join(path, 'images')
+    videos_dir = os.path.join(path, 'video')
+    docs_dir = os.path.join(path, 'documents')
+    music_dir = os.path.join(path, 'audio')
+    archives_dir = os.path.join(path, 'archives')
+    unknown_files_dir = os.path.join(path, 'unknown_files')
     
     dir_path = Path(path).absolute()
     files_list = []
     files_list = collect_all_files(dir_path, files_list)
     
-    create_new_directories(dir_path)
+    create_new_directories(dir_path,
+                           images_dir,videos_dir, docs_dir,
+                           music_dir, archives_dir, unknown_files_dir)
 
     regexp_images = re.compile(r'\.(jpg|png|jpeg|svg)$')
     regexp_videos = re.compile(r'\.(avi|mp4|mpv|mkv)$')
@@ -64,7 +62,8 @@ def sort(path):
             move_file(file, unknown_files_dir, norm_file)
             unknown_extensions.add(norm_file.suffix)
 
-    remove_empty_folders(path)
+    remove_empty_folders(path, images_dir,videos_dir, docs_dir,
+                        music_dir, archives_dir, unknown_files_dir)
     unpack_archives(archives_dir)
     write_job_report(path)
     
@@ -80,7 +79,9 @@ def collect_all_files(path,files_list):
     return files_list
 
 
-def create_new_directories(path):
+def create_new_directories(path,
+                           images_dir,videos_dir, docs_dir,
+                           music_dir, archives_dir, unknown_files_dir):
     
     if not os.path.exists(images_dir):
         os.makedirs(images_dir)
@@ -126,7 +127,9 @@ def move_file(orig_file, directory, norm_file):
     known_extensions.add(norm_file.suffix)    
             
 
-def remove_empty_folders(directory):
+def remove_empty_folders(directory,
+                        images_dir,videos_dir, docs_dir,
+                        music_dir, archives_dir, unknown_files_dir):
     
     regexp_ds = re.compile(r'\.(DS_Store)$')
 
@@ -189,8 +192,8 @@ def write_job_report(path):
     
 
 def print_report():
-    sort(path)
-    print('The path have been cleaned!!!')
+    sort(sys.argv[1])
+    print('The folder have been cleaned!!!')
 
 
 
